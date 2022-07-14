@@ -118,15 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label3.Text" xml:space="preserve">
-    <value>ПРАВИЛА:
-Вы можете двигаться в любом направлении до первого препятствия
-используя стрелки на боковой клавиатуре
-Препятствия: # - не проходимая стена
-             вы можете остановить свое движение на *
-Цель игры собрать все @
-Остерегайтесь ловушек % и призрака ?.  
+    <value>RULES:
+You can move in any direction until the first obstacle
+using the arrows on the side keyboard
+Obstacles: # - impenetrable wall
+              you can stop your movement at *
+The goal of the game is to collect all @
+Beware of traps %.
 
 
-РЕЗУЛЬТАТЫ:</value>
+RESALTS:</value>
   </data>
 </root>

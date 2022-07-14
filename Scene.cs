@@ -1,37 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace InertiaUI
 {
     class Scene
     {
-        private GameObject[,] _scene;
+        static private Dictionary<int, string> filesWhithLevels;
 
+        static private int _level;
+
+        private GameObject[,] _scene;
+        public string[] _sceneLines;
         private GameObject cellUnderGost;
 
-        //конструктор
-        public Scene(string[] scene)
+        public Scene()
         {
-            var width = scene[0].Length;
+            string _defaultLevel = "Scenes\\Scene0.json";
+            string Scene1 = "Scenes\\Scene1.json";
+            string Scene2 = "Scenes\\Scene2.json";
+            filesWhithLevels = new Dictionary<int, string>();
+            filesWhithLevels.Add(0, _defaultLevel);
+            filesWhithLevels.Add(1, Scene1);
+            filesWhithLevels.Add(2, Scene2);
 
-            _scene = new GameObject[scene.Length, width];
 
+        }
 
-            //генерация поля
-            for (int y = 0; y < scene.Length; y++)
+        internal int GetHeight()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetLevel(int level)
+        {
+            _level = level;
+            if (!File.Exists(filesWhithLevels[level]))
             {
-                if (scene[y].Length != width) throw new ArgumentException("All strings must have the same length");
+                throw new FileNotFoundException("File dose not exist");
+            }
+
+            var linesText = File.ReadAllText(filesWhithLevels[level]);
+
+            _sceneLines = JsonSerializer.Deserialize<string[]>(linesText);
+            var width = _sceneLines[0].Length;
+            _scene = new GameObject[_sceneLines.Length, width];
+
+            DefineStartPosition();
+
+            for (int y = 0; y < _sceneLines.Length; y++)
+            {
+                if (_sceneLines[y].Length != width) throw new ArgumentException("All strings must have the same length");
                 for (int x = 0; x < width; x++)
                 {
-                    _scene[y, x] = GameObject.Create(scene[y][x]);
+                    _scene[y, x] = GameObject.Create(_sceneLines[y][x]);
                 }
             }
 
+            CountPrizes();
+            
+        }
 
-            //подсчет призов
+        private void CountPrizes()
+        {
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
@@ -42,17 +77,34 @@ namespace InertiaUI
                     }
                 }
             }
+        }
 
-        }//конструктор
 
+        internal int GetLine(int y)
+        {
+            throw new NotImplementedException();
+        }
 
-        //должен ли игрк остановится на данной клетке
+        internal void DefineStartPosition()
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                var x = _sceneLines[y].IndexOf("I");
+                if (x >= 0)
+                {
+                    MainForm._player.x = x;
+                    MainForm._player.y = y;
+                    _sceneLines[y] = _sceneLines[y].Replace('I', ' ');
+                    break;
+                }
+            }
+        }
+
         internal bool MustStop(int x, int y)
         {
             return _scene[y, x].MustStop;
         }
 
-        //собираем приз
         internal void GetPrize(int x, int y)
         {
             PrizeCount--;
@@ -65,33 +117,19 @@ namespace InertiaUI
             return _scene[y, x].Action;
         }
 
-        //может ли наступить на данную клетку
         internal bool CanStepInto(int x, int y)
         {
-            if (_scene[y, x] is Ghost)
-                return cellUnderGost.CanStepInto;
             return _scene[y, x].CanStepInto;
         }
 
-
-        internal void GhostStep(int x, int y)
-        {
-            cellUnderGost = _scene[y, x];
-            _scene[y, x] = new Ghost();
-        }
-
-        internal void GhostGone(int x, int y)
-        {
-            _scene[y, x] = cellUnderGost;
-        }
 
         public int Width => _scene.GetLength(1);
 
         public int Height => _scene.GetLength(0);
         public int PrizeCount { get; internal set; }
 
+        public int Level => _level;
 
-        //индексатор(получаем символ отображающий клетку поля)
         public char this[int x, int y] => _scene[y, x].Figure;
 
 

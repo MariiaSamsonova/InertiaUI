@@ -5,7 +5,6 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Media;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -16,35 +15,8 @@ namespace InertiaUI
 {
     public partial class MainForm : Form
     {
-        static private SoundPlayer sound = new SoundPlayer("sound.wav");
-
-        static private string _fileName = "Scenes\\Scene1.json";
-        static private string _fileName2 = "Scenes\\Scene3.json";
-
-        static private string[] _defaultLevel = {
-            "I         ",
-            "    @  @% ",
-            "@  *    # ",
-            "  %@@     ",
-            " *  %%    ",
-            "     @%@  ",
-            "       * #",
-            "      @   ",
-            " * #  %*  ",
-            " %#@  @  #"};
-
-        static private string[] _sceneLines;
-        static private Scene _scene;
-
-        static private int _playerX = 0;
-        static private int _playerY = 0;
-        static private int _ghostX = 0;
-        static private int _ghostY = 0;
-
-        static private int _lives = 3;
-        static private int _level;
-
-        static bool _sound = true;
+        static internal Scene _scene;
+        static internal Player _player;
         static DateTime time;
 
         public MainForm()
@@ -52,20 +24,13 @@ namespace InertiaUI
             InitializeComponent();
         }
 
-        private void Play()
+        private void DrawField()
         {
-            PlayerStartPosition();
-            _scene = new Scene(_sceneLines);
-            int height = _scene.Height;
-            int width = _scene.Width;
-
-            field.SetSize(width, height);
-
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < _scene.Height; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < _scene.Width; x++)
                 {
-                    if(x == _playerX && y == _playerY)
+                    if (x == _player.x && y == _player.y)
                     {
                         field.SetSymbol(x, y, '☺');
 
@@ -76,47 +41,31 @@ namespace InertiaUI
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Play_Click(object sender, EventArgs e)
         {
-            _playerX = 0;
-            _playerY = 0;
-            label2.Text = "";
-            _lives = 3;
+            _player = new Player();
+            gameResul.Text = "";
+            _scene = new Scene();
+
             switch (comboBoxLevel.SelectedIndex)
             {
 
                 case 0:
-                    _level = 1;
-                    if (!File.Exists(_fileName))
-                    {
-                        throw new FileNotFoundException("File dose not exist");
-                    }
-
-                    var linesText = File.ReadAllText(_fileName);
-
-                    _sceneLines = JsonSerializer.Deserialize<string[]>(linesText);
+                    _scene.SetLevel(0);
                     break;
                 case 1:
-                    _level = 2;
-                    _sceneLines = _defaultLevel;
+                    _scene.SetLevel(1);
                     break;
                 case 2:
-                    _level = 3;
-                    if (!File.Exists(_fileName2))
-                    {
-                        throw new FileNotFoundException("File dose not exist");
-                    }
-
-                    var linesText2 = File.ReadAllText(_fileName2);
-
-                    _sceneLines = JsonSerializer.Deserialize<string[]>(linesText2);
+                    _scene.SetLevel(2);
                     break;
                 default:
                     return;
 
-            }
+            };
 
-            Play();
+            field.SetSize(_scene.Width, _scene.Height);
+            DrawField();
             time = DateTime.Now;
         }
 
@@ -160,62 +109,65 @@ namespace InertiaUI
             MakeMove(Direction.RightDown, '☺');
         }
 
-        private static void PlayerStartPosition()
+
+
+
+        private void buttonSound_Click(object sender, EventArgs e)
         {
-            for (int y = 0; y < _sceneLines.Length; y++)
+            switch (buttonSound.Text)
             {
-                var x = _sceneLines[y].IndexOf("I");
-                if (x >= 0)
-                {
-                    _playerX = x;
-                    _playerY = y;
-                    _sceneLines[y] = _sceneLines[y].Replace('I', ' ');
+                case "🔈":
+                    {
+                        buttonSound.Text = "🔇";
+                        Sound.TurnOffSound();
+                    }
                     break;
-                }
+                case "🔇":
+                    {
+                        buttonSound.Text = "🔈";
+                        Sound.TurnOnSound();
+                    }
+                    break;
             }
+
         }
 
         private void MakeMove(Direction direction, char name)
         {
-            while(_scene.PrizeCount > 0 && _lives > 0)
+            while (_scene.PrizeCount > 0 && _player.lives > 0)
             {
-                GetNewPosition(direction, _playerX, _playerY, out var newPlayerX, out var newPlayerY);
-                if (newPlayerX < 0 || newPlayerY < 0 || newPlayerX >= _scene.Width || newPlayerY >= _scene.Height)
+                Mechanics.GetNewPosition(direction, _player.x, _player.y, out var newPlayerX, out var newPlayerY);
+                if (!Mechanics.CanMove(newPlayerX, newPlayerY))
                 {
-                    return;//ничего не делаем если игрок пытается выйти за границу поля
+                    return;
                 }
 
-                if (!_scene.CanStepInto(newPlayerX, newPlayerY))
-                {
-                    return;//ничего не делаем если игрок не может наступить на клетку
-                }
-
-                DrawCell(_playerX, _playerY, _scene[_playerX, _playerY]);
+                DrawCell(_player.x, _player.y, _scene[_player.x, _player.y]);
 
                 DrawCell(newPlayerX, newPlayerY, name);
 
-                _playerX = newPlayerX;
-                _playerY = newPlayerY;
+                _player.x = newPlayerX;
+                _player.y = newPlayerY;
 
-                Action action = _scene.GetAction(_playerX, _playerY);
+                Action action = _scene.GetAction(_player.x, _player.y);
 
                 switch (action)
                 {
                     case Action.GameOver:
                         {
-                            _lives--;
-                            if (_sound == true)
+                            _player.lives--;
+                            if (Sound.SoundIsOn())
                             {
-                                    sound.Play();
+                                Sound.Play();
                             }
-                            if (_lives == 0)
+                            if (_player.lives == 0)
                             {
-                                GameOver();//проиграш
+                                GameOver();
                             }
                             break;
                         }
                     case Action.GetPrize:
-                        _scene.GetPrize(_playerX, _playerY);
+                        _scene.GetPrize(_player.x, _player.y);
                         break;
                 }
 
@@ -224,7 +176,7 @@ namespace InertiaUI
                     Win();
                 }
 
-                if (_scene.MustStop(_playerX, _playerY))
+                if (_scene.MustStop(_player.x, _player.y))
                 {
                     return;
                 }
@@ -239,68 +191,26 @@ namespace InertiaUI
             };
         }
 
-        private void Win()
-        {
-            label2.Text = "Win\n" + "Осталось жизней - " + _lives;
-            string result = "\n" + DateTime.Now.Subtract(time) + "     " + _lives;
-            if (_level == 1)
-            {
-                label4.Text += result;
-            }
-            else if(_level == 2)
-                label5.Text += result;
-        }
-
-        private void GameOver()
-        {
-                label2.Text = "Game Over :(\n" + "Осталось несобраных призов - " + _scene.PrizeCount;
-        }
-
-        private static void GetNewPosition(Direction direction, int _playerX, int _playerY, out int newPlayerX, out int newPlayerY)
-        {
-            newPlayerX = _playerX;
-            newPlayerY = _playerY;
-
-            if (direction == Direction.Up || direction == Direction.LeftUp || direction == Direction.RightUp)
-            {
-                --newPlayerY;
-            }
-            if (direction == Direction.Down || direction == Direction.LeftDown || direction == Direction.RightDown)
-            {
-                ++newPlayerY;
-            }
-            if (direction == Direction.Left || direction == Direction.LeftDown || direction == Direction.LeftUp)
-            {
-                --newPlayerX;
-            }
-            if (direction == Direction.Right || direction == Direction.RightDown || direction == Direction.RightUp)
-            {
-                ++newPlayerX;
-            }
-        }
-
-        private void buttonSound_Click(object sender, EventArgs e)
-        {
-            switch (buttonSound.Text)
-            {
-                case "🔈":
-                    {
-                        buttonSound.Text = "🔇";
-                        _sound = false;
-                    }
-                    break;
-                case "🔇":
-                    {
-                        buttonSound.Text = "🔈";
-                        _sound = true;
-                    }
-                    break;
-            }
-
-        }
         private void DrawCell(int x, int y, char symbol)
         {
             field.SetSymbol(x, y, symbol);
+        }
+
+        public void Win()
+        {
+            gameResul.Text = "Win\n" + "Lives left - " + _player.lives;
+            string result = "\n" + DateTime.Now.Subtract(time) + "     " + _player.lives;
+            if (_scene.Level == 1)
+            {
+                resultsLevel1.Text += result;
+            }
+            else if (_scene.Level == 2)
+                resultsLevel2.Text += result;
+        }
+
+        public void GameOver()
+        {
+            gameResul.Text = "Game Over :(\n" + "Осталось несобраных призов - " + _scene.PrizeCount;
         }
     }
 }

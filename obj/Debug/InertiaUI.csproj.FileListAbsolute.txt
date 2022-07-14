@@ -53,3 +53,29 @@ C:\Users\Not me\Desktop\ХНУРЭ\ООП\GUI\InertiaUI\obj\Debug\InertiaUI.exe
 C:\Users\Not me\Desktop\ХНУРЭ\ООП\GUI\InertiaUI\obj\Debug\InertiaUI.pdb
 C:\Users\Not me\Desktop\ХНУРЭ\ООП\GUI\InertiaUI\bin\Debug\sound.wav
 C:\Users\Not me\Desktop\ХНУРЭ\ООП\GUI\InertiaUI\bin\Debug\Scenes\Scene3.json
+D:\ХНУРЭ\Inertia\bin\Debug\Scenes\Scene1.json
+D:\ХНУРЭ\Inertia\bin\Debug\sound.wav
+D:\ХНУРЭ\Inertia\bin\Debug\InertiaUI.exe.config
+D:\ХНУРЭ\Inertia\bin\Debug\InertiaUI.exe
+D:\ХНУРЭ\Inertia\bin\Debug\InertiaUI.pdb
+D:\ХНУРЭ\Inertia\bin\Debug\System.Buffers.dll
+D:\ХНУРЭ\Inertia\bin\Debug\System.Memory.dll
+D:\ХНУРЭ\Inertia\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+D:\ХНУРЭ\Inertia\bin\Debug\System.Numerics.Vectors.xml
+D:\ХНУРЭ\Inertia\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+D:\ХНУРЭ\Inertia\bin\Debug\System.Text.Encodings.Web.xml
+D:\ХНУРЭ\Inertia\bin\Debug\System.Text.Json.xml
+D:\ХНУРЭ\Inertia\bin\Debug\System.Threading.Tasks.Extensions.xml
+D:\ХНУРЭ\Inertia\bin\Debug\System.ValueTuple.xml
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.csproj.AssemblyReference.cache
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.csproj.SuggestedBindingRedirects.cache
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.MainForm.resources
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.Properties.Resources.resources
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.Square.resources
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.csproj.GenerateResource.cache
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.csproj.CoreCompileInputs.cache
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.csproj.CopyComplete
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.exe
+D:\ХНУРЭ\Inertia\obj\Debug\InertiaUI.pdb
+D:\ХНУРЭ\Inertia\bin\Debug\Scenes\Scene0.json
+D:\ХНУРЭ\Inertia\bin\Debug\Scenes\Scene2.json
