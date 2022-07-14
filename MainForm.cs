@@ -210,7 +210,7 @@ namespace InertiaUI
 
         public void GameOver()
         {
-            gameResul.Text = "Game Over :(\n" + "Осталось несобраных призов - " + _scene.PrizeCount;
+            gameResul.Text = "Game Over :(\n" + "Prizes left: " + _scene.PrizeCount;
         }
     }
 }
